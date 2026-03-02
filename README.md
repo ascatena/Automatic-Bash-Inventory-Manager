@@ -58,7 +58,7 @@ El sistema:
 
 ## Arquitectura del Sistema
 
-El programa se organiza en funciones independientes que gestionan cada responsabilidad del sistema:
+El programa `inventory_manager.sh` se organiza en funciones independientes que gestionan cada responsabilidad del sistema:
 
 - `menu()` → Interfaz principal  
 - `nuevoProducto()` → Validación y carga de nuevos productos  
@@ -93,156 +93,27 @@ Las validaciones se realizan mediante expresiones regulares y estructuras de con
 
 ---
 
-## Funcionalidades
-
-### 1. Agregar Producto
-
-- Solicita nombre, precio y cantidad.  
-- Valida cada campo individualmente.  
-- Evita duplicados.  
-- Permite reingreso antes de confirmar.  
-- Crea automáticamente el archivo si no existe.  
-- Permite elegir extensión `.txt` o `.csv`.  
-
----
-
-### 2. Listar Productos
-
-- Verifica existencia del archivo.  
-- Comprueba si está vacío.  
-- Presenta los datos formateados en columnas mediante `printf`.  
-- Utiliza `IFS=',' read` para parseo estructurado.  
-
----
-
-### 3. Buscar Producto
-
-- Búsqueda por nombre mediante `grep -i -n`.  
-- Muestra número de línea y contenido.  
-- Permite:
-  - Editar una línea específica.  
-  - Eliminar múltiples líneas.  
-  - Confirmar eliminación.  
-- Valida coherencia entre líneas encontradas y líneas seleccionadas.  
-
-La edición utiliza `sed -i` para modificar registros en sitio.
-
----
-
-### 4. Ordenar Productos por Precio
-
-- Ordenamiento ascendente.  
-- Uso de `sort -t',' -k2 -n`.  
-- Formateo posterior con `printf`.  
-
----
-
-## Manejo de Errores
-
-El sistema implementa un modelo de error no fatal:
-
-- Todas las entradas inválidas generan mensajes claros.  
-- Se permite reintento sin reiniciar el programa.  
-- No existen terminaciones abruptas ante error de usuario.  
-- Se valida existencia y contenido del archivo en cada operación crítica.  
-
----
-
-## Diagrama de Flujo General
-
-```mermaid
-flowchart TD
-
-    Inicio["Ejecución del Script"] --> Parametros{"¿Parámetro -h o --help?"}
-    Parametros -- Sí --> Help["Mostrar ayuda y finalizar"]
-    Parametros -- No --> Menu["Mostrar menú principal"]
-
-    Menu --> Opcion{"Seleccionar opción"}
-
-    Opcion -->|1| AgregarInicio
-    Opcion -->|2| ListarInicio
-    Opcion -->|3| BuscarInicio
-    Opcion -->|4| OrdenarInicio
-    Opcion -->|Q| Salir
-
-    %% Agregar Producto
-    AgregarInicio["Ingreso de nombre"] --> ValidarNombre{"¿Nombre válido?"}
-    ValidarNombre -- No --> AgregarInicio
-    ValidarNombre -- Sí --> IngresoPrecio["Ingreso de precio"]
-
-    IngresoPrecio --> ValidarPrecio{"¿Precio válido?"}
-    ValidarPrecio -- No --> IngresoPrecio
-    ValidarPrecio -- Sí --> IngresoCantidad["Ingreso de cantidad"]
-
-    IngresoCantidad --> ValidarCantidad{"¿Cantidad válida?"}
-    ValidarCantidad -- No --> IngresoCantidad
-    ValidarCantidad -- Sí --> ConfirmarDatos{"¿Confirmar datos?"}
-
-    ConfirmarDatos -- Reingresar --> AgregarInicio
-    ConfirmarDatos -- Confirmar --> Persistir["Guardar en archivo"]
-    Persistir --> Volver1["Volver al menú"]
-
-    %% Listar Producto
-    ListarInicio["Verificar existencia de archivo"] --> ArchivoExiste1{"¿Archivo existe?"}
-    ArchivoExiste1 -- No --> Error1["Mostrar error"]
-    ArchivoExiste1 -- Sí --> ArchivoVacio1{"¿Archivo vacío?"}
-    ArchivoVacio1 -- Sí --> Warning1["Mostrar advertencia"]
-    ArchivoVacio1 -- No --> MostrarListado["Imprimir productos formateados"]
-    MostrarListado --> Volver2["Volver al menú"]
-
-    %% Buscar Producto
-    BuscarInicio["Ingresar criterio de búsqueda"] --> ValidarBusqueda{"Entrada válida?"}
-    ValidarBusqueda -- No --> BuscarInicio
-    ValidarBusqueda -- Sí --> EjecutarBusqueda["Buscar con grep"]
-    EjecutarBusqueda --> Encontrado{"¿Coincidencias?"}
-    Encontrado -- No --> NoEncontrado["Informar no encontrado"]
-    Encontrado -- Sí --> Accion{"Editar / Eliminar / Volver"}
-
-    Accion -->|Editar| EditarLinea["Seleccionar línea y campo"]
-    EditarLinea --> Actualizar["Modificar con sed"]
-    Actualizar --> Volver3["Volver al menú"]
-
-    Accion -->|Eliminar| SeleccionarLineas["Seleccionar líneas"]
-    SeleccionarLineas --> ConfirmarElim{"¿Confirmar eliminación?"}
-    ConfirmarElim -- No --> Volver3
-    ConfirmarElim -- Sí --> EliminarLineas["Eliminar con sed"]
-    EliminarLineas --> Volver3
-
-    Accion -->|Volver| Volver3
-
-    %% Ordenar Producto
-    OrdenarInicio["Verificar existencia de archivo"] --> ArchivoExiste2{"¿Archivo existe?"}
-    ArchivoExiste2 -- No --> Error2["Mostrar error"]
-    ArchivoExiste2 -- Sí --> ArchivoVacio2{"¿Archivo vacío?"}
-    ArchivoVacio2 -- Sí --> Warning2["Mostrar advertencia"]
-    ArchivoVacio2 -- No --> Ordenar["Ordenar con sort"]
-    Ordenar --> MostrarOrdenado["Imprimir listado ordenado"]
-    MostrarOrdenado --> Volver4["Volver al menú"]
-
-    Salir["Finalizar programa"]
-
-```
-
----
-
-## Instalación Rápido y Modo de Uso
+## Instalación Rápida y Modo de Uso
 
 ```bash
 # Clonar el repositorio
-git clone [https://github.com/tu-usuario/bash-inventory-manager.git](https://github.com/tu-usuario/bash-inventory-manager.git)
+git clone https://github.com/tu-usuario/bash-inventory-manager.git
 
 # Entrar al directorio
 cd bash-inventory-manager
 
 # Dar permisos y ejecutar
-chmod +x e13.sh
-./e13.sh
+chmod +x inventory_manager.sh
+./inventory_manager.sh
 ```
+
 ### Mostrar ayuda
 
 ```bash
-./e13.sh -h
+./inventory_manager.sh -h
 ```
+
+---
 
 ## Flujo de Uso del Sistema
 
@@ -330,6 +201,7 @@ Durante toda la ejecución:
 - No es necesario reiniciar el programa ante errores.
 
 Este enfoque mejora la experiencia de usuario y evita inconsistencias en el archivo de inventario.
+
 ---
 
 ## Tecnologías y Herramientas Utilizadas
